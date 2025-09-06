@@ -1,0 +1,2110 @@
+
+<img id="heroImage1" src="YOUR_NEW_IMAGE_URL" alt="Beauty Salon Interior" class="hero-image active">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blume Beauty Salon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-bg {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+        }
+        
+        .hero-image.active {
+            opacity: 1;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+            z-index: 1;
+        }
+        
+        .hero-content {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hero-content.fade-out {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        
+
+        
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .sticky-header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gallery-card {
+            perspective: 1000px;
+            height: 300px;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        
+        .gallery-card:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .fade-in-delay-1 { animation-delay: 0.1s; }
+        .fade-in-delay-2 { animation-delay: 0.2s; }
+        .fade-in-delay-3 { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop&crop=center');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slide-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: white;
+            z-index: 2000;
+            transition: right 0.4s ease;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 640px) {
+            .slide-panel {
+                max-width: 100%;
+            }
+        }
+        
+        .slide-panel.open {
+            right: 0;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .gallery-slider {
+            overflow: hidden;
+        }
+        
+        .gallery-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .service-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { left: 20%; animation-delay: 1s; }
+        .floating-element:nth-child(3) { left: 80%; animation-delay: 2s; }
+        .floating-element:nth-child(4) { left: 70%; animation-delay: 3s; }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+        
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+        
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px);
+            color: #f59e0b;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .gallery-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .gallery-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .gallery-tab {
+            color: #6b7280;
+            background: transparent;
+        }
+        
+        .gallery-tab.active {
+            color: #f59e0b;
+            background: #fef3c7;
+        }
+        
+        .gallery-tab:hover {
+            color: #f59e0b;
+            background: #fef9e7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="text-center">
+            <div class="loading-spinner mb-4"></div>
+            <h2 class="playfair text-2xl font-bold text-white mb-2">Blume Beauty</h2>
+            <p class="text-white opacity-80">Loading your beauty experience...</p>
+        </div>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element text-6xl">✨</div>
+        <div class="floating-element text-4xl">💄</div>
+        <div class="floating-element text-5xl">💅</div>
+        <div class="floating-element text-4xl">✂️</div>
+    </div>
+    
+    <!-- Header -->
+    <header class="sticky-header shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#home" class="flex items-center space-x-4 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=48&h=48&fit=crop&crop=center" alt="Blume Beauty Logo" class="w-12 h-12 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center" style="display: none;">
+                        <span class="text-white font-bold text-xl">B</span>
+                    </div>
+                    <div>
+                        <h1 class="playfair text-2xl font-bold text-gray-800">Blume Beauty</h1>
+                        <p class="text-sm text-gray-600">Professional Salon</p>
+                    </div>
+                </a>
+                <nav class="hidden md:flex space-x-4 lg:space-x-8">
+                    <a href="#home" class="text-gray-700 hover:text-amber-600 transition-colors text-sm lg:text-base">Home</a>
+                    <a href="#services" class="text-gray-700 hover:text-amber-600 transition-colors text-sm lg:text-base">Services</a>
+                    <div class="relative group">
+                        <button class="text-gray-700 hover:text-amber-600 transition-colors text-sm lg:text-base flex items-center">
+                            Gallery
+                            <svg class="w-4 h-4 ml-1 transform group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute top-full left-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                            <div class="p-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <!-- Women's Gallery -->
+                                    <div class="cursor-pointer" onclick="scrollToGallery('women')">
+                                        <div class="relative overflow-hidden rounded-lg mb-3">
+                                            <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=180&h=120&fit=crop&crop=center" alt="Women's Gallery" class="w-full h-24 object-cover hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="w-full h-24 bg-gradient-to-br from-pink-200 to-rose-300 flex items-center justify-center text-3xl" style="display: none;">💇‍♀️</div>
+                                            <div class="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                                <span class="text-white font-semibold opacity-0 hover:opacity-100 transition-opacity">View Gallery</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="font-semibold text-gray-800 mb-1">Women's Gallery</h3>
+                                        <p class="text-xs text-gray-600">Hair, makeup, skincare & more</p>
+                                    </div>
+                                    
+                                    <!-- Men's Gallery -->
+                                    <a href="https://example.com/mens-gallery" target="_blank" rel="noopener noreferrer" class="cursor-pointer block">
+                                        <div class="relative overflow-hidden rounded-lg mb-3">
+                                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=180&h=120&fit=crop&crop=face" alt="Men's Gallery" class="w-full h-24 object-cover hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="w-full h-24 bg-gradient-to-br from-blue-200 to-indigo-300 flex items-center justify-center text-3xl" style="display: none;">✂️</div>
+                                            <div class="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                                <span class="text-white font-semibold opacity-0 hover:opacity-100 transition-opacity">View Gallery</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="font-semibold text-gray-800 mb-1">Men's Gallery</h3>
+                                        <p class="text-xs text-gray-600">Cuts, grooming, skincare & shaves</p>
+                                    </a>
+                                </div>
+                                
+                                <div class="border-t pt-3 mt-3">
+                                    <a href="#gallery" class="text-amber-600 hover:text-amber-700 text-sm font-medium flex items-center justify-center">
+                                        View All Galleries
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#team" class="text-gray-700 hover:text-amber-600 transition-colors text-sm lg:text-base">Join Our Team</a>
+                    <button onclick="openContactPanel()" class="text-gray-700 hover:text-amber-600 transition-colors text-sm lg:text-base">Contact</button>
+                </nav>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openBookingPanel()" class="bg-amber-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-amber-700 transition-colors text-sm sm:text-base">
+                        Book Now
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-gray-700 hover:text-amber-600 p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden bg-white border-t border-gray-200 hidden" id="mobileMenu">
+            <div class="px-6 py-4 space-y-3">
+                <a href="#home" class="block text-gray-700 hover:text-amber-600 transition-colors py-2">Home</a>
+                <a href="#services" class="block text-gray-700 hover:text-amber-600 transition-colors py-2">Services</a>
+                <div class="py-2">
+                    <button onclick="toggleMobileGallery()" class="flex items-center justify-between w-full text-gray-700 hover:text-amber-600 transition-colors">
+                        Gallery
+                        <svg class="w-4 h-4 transform transition-transform" id="mobileGalleryArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="hidden mt-2 ml-4 space-y-2" id="mobileGalleryDropdown">
+                        <button onclick="scrollToGallery('women')" class="flex items-center space-x-3 w-full text-left text-gray-600 hover:text-amber-600 transition-colors py-2">
+                            <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=40&h=40&fit=crop&crop=center" alt="Women's Gallery" class="w-8 h-8 rounded object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="w-8 h-8 bg-gradient-to-br from-pink-200 to-rose-300 rounded flex items-center justify-center text-sm" style="display: none;">💇‍♀️</div>
+                            <span>Women's Gallery</span>
+                        </button>
+                        <a href="https://example.com/mens-gallery" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 w-full text-left text-gray-600 hover:text-amber-600 transition-colors py-2">
+                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=40&h=40&fit=crop&crop=face" alt="Men's Gallery" class="w-8 h-8 rounded object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-200 to-indigo-300 rounded flex items-center justify-center text-sm" style="display: none;">✂️</div>
+                            <span>Men's Gallery</span>
+                        </a>
+                    </div>
+                </div>
+                <a href="#team" class="block text-gray-700 hover:text-amber-600 transition-colors py-2">Join Our Team</a>
+                <button onclick="openContactPanel()" class="block w-full text-left text-gray-700 hover:text-amber-600 transition-colors py-2">Contact</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg pt-24">
+        <!-- Hero Images -->
+        <img id="heroImage1" src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1920&h=1080&fit=crop&crop=center" alt="Beauty Salon Interior" class="hero-image active" onerror="this.style.display='none';">
+        <img id="heroImage2" src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1920&h=1080&fit=crop&crop=center" alt="Hair Styling" class="hero-image" onerror="this.style.display='none';">
+        <img id="heroImage3" src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1920&h=1080&fit=crop&crop=center" alt="Makeup Application" class="hero-image" onerror="this.style.display='none';">
+        <img id="heroImage4" src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=1920&h=1080&fit=crop&crop=center" alt="Skincare Treatment" class="hero-image" onerror="this.style.display='none';">
+        
+        <!-- Hero Overlay -->
+        <div class="hero-overlay"></div>
+        
+        <div class="container mx-auto px-6 py-20 relative z-10">
+            <div class="max-w-4xl mx-auto text-center hero-content">
+                <h1 id="heroTitle" class="playfair text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight fade-in px-2">
+                    Beauty Redefined
+                </h1>
+                <p id="heroSubtitle" class="text-sm xs:text-base sm:text-lg md:text-xl text-white mb-6 sm:mb-8 max-w-2xl mx-auto px-4 fade-in fade-in-delay-1 leading-relaxed">
+                    Experience luxury and elegance at Blume Beauty. Where every visit transforms you into your most beautiful self - for everyone.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center px-4 fade-in fade-in-delay-2">
+                    <button onclick="openBookingPanel()" class="bg-amber-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg hover:bg-amber-700 transition-all duration-300 transform hover:scale-105 pulse-glow">
+                        Book Appointment
+                    </button>
+                    <button onclick="openContactPanel()" class="border-2 border-amber-600 text-amber-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg hover:bg-amber-600 hover:text-white transition-all duration-300 transform hover:scale-105">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <div class="text-white text-center">
+                    <div class="text-sm mb-2 opacity-80">Scroll to explore</div>
+                    <div class="text-2xl">↓</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="playfair text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 px-4 leading-tight">Our Services</h2>
+                <p class="text-sm xs:text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4 leading-relaxed">
+                    Discover our comprehensive range of beauty services designed to enhance your natural radiance
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+                <!-- Women's Services -->
+                <div class="service-card relative h-64 sm:h-72 lg:h-80 rounded-2xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden group" onclick="openServiceModal('haircare')">
+                    <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=320&fit=crop&crop=face" alt="Hair Care" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="absolute inset-0 bg-gradient-to-br from-pink-50 to-rose-100 flex items-center justify-center" style="display: none;">
+                        <div class="text-6xl">✂️</div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 group-hover:via-black/30 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                        <h3 class="playfair text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 group-hover:text-pink-200 transition-colors duration-300">Women's Hair Care</h3>
+                        <p class="text-white/90 mb-3 text-sm sm:text-base group-hover:text-white transition-colors duration-300">Professional cuts, styling, coloring, and treatments</p>
+                        <span class="text-pink-300 font-semibold text-sm sm:text-base group-hover:text-pink-200 group-hover:translate-x-2 transition-all duration-300">Learn More →</span>
+                    </div>
+                </div>
+                
+                <div class="service-card relative h-64 sm:h-72 lg:h-80 rounded-2xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden group" onclick="openServiceModal('skincare')">
+                    <img src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&h=320&fit=crop&crop=face" alt="Skin Care" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-indigo-100 flex items-center justify-center" style="display: none;">
+                        <div class="text-6xl">✨</div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 group-hover:via-black/30 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                        <h3 class="playfair text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 group-hover:text-purple-200 transition-colors duration-300">Skin Care</h3>
+                        <p class="text-white/90 mb-3 text-sm sm:text-base group-hover:text-white transition-colors duration-300">Rejuvenating facials, treatments, and skincare consultations</p>
+                        <span class="text-purple-300 font-semibold text-sm sm:text-base group-hover:text-purple-200 group-hover:translate-x-2 transition-all duration-300">Learn More →</span>
+                    </div>
+                </div>
+                
+                <div class="service-card relative h-64 sm:h-72 lg:h-80 rounded-2xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden group" onclick="openServiceModal('nails')">
+                    <img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=320&fit=crop&crop=center" alt="Nail Care" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center" style="display: none;">
+                        <div class="text-6xl">💅</div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 group-hover:via-black/30 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                        <h3 class="playfair text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 group-hover:text-amber-200 transition-colors duration-300">Nail Care</h3>
+                        <p class="text-white/90 mb-3 text-sm sm:text-base group-hover:text-white transition-colors duration-300">Manicures, pedicures, nail art, and gel treatments</p>
+                        <span class="text-amber-300 font-semibold text-sm sm:text-base group-hover:text-amber-200 group-hover:translate-x-2 transition-all duration-300">Learn More →</span>
+                    </div>
+                </div>
+                
+                <div class="service-card relative h-64 sm:h-72 lg:h-80 rounded-2xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden group" onclick="openServiceModal('makeup')">
+                    <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=320&fit=crop&crop=face" alt="Makeup Services" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-100 flex items-center justify-center" style="display: none;">
+                        <div class="text-6xl">💄</div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 group-hover:via-black/30 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                        <h3 class="playfair text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 group-hover:text-blue-200 transition-colors duration-300">Makeup Services</h3>
+                        <p class="text-white/90 mb-3 text-sm sm:text-base group-hover:text-white transition-colors duration-300">Professional makeup for special events and occasions</p>
+                        <span class="text-blue-300 font-semibold text-sm sm:text-base group-hover:text-blue-200 group-hover:translate-x-2 transition-all duration-300">Learn More →</span>
+                    </div>
+                </div>
+                
+                <!-- Shared Services -->
+                <div class="service-card relative h-64 sm:h-72 lg:h-80 rounded-2xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden group" onclick="openServiceModal('massage')">
+                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=320&fit=crop&crop=center" alt="Massage Therapy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center" style="display: none;">
+                        <div class="text-6xl">🌿</div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 group-hover:via-black/30 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                        <h3 class="playfair text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 group-hover:text-green-200 transition-colors duration-300">Relaxation Therapy</h3>
+                        <p class="text-white/90 mb-3 text-sm sm:text-base group-hover:text-white transition-colors duration-300">Swedish massage and aromatherapy treatments</p>
+                        <span class="text-green-300 font-semibold text-sm sm:text-base group-hover:text-green-200 group-hover:translate-x-2 transition-all duration-300">Learn More →</span>
+                    </div>
+                </div>
+                
+
+                
+                <div class="service-card relative h-64 sm:h-72 lg:h-80 rounded-2xl cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden group" onclick="openServiceModal('bridal')">
+                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=320&fit=crop&crop=face" alt="Bridal Packages" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center" style="display: none;">
+                        <div class="text-6xl">👰</div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 group-hover:via-black/30 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-300">
+                        <h3 class="playfair text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 group-hover:text-red-200 transition-colors duration-300">Bridal Packages</h3>
+                        <p class="text-white/90 mb-3 text-sm sm:text-base group-hover:text-white transition-colors duration-300">Complete bridal beauty packages for your special day</p>
+                        <span class="text-red-300 font-semibold text-sm sm:text-base group-hover:text-red-200 group-hover:translate-x-2 transition-all duration-300">Learn More →</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <div class="text-white text-center">
+                    <div class="text-sm mb-2 opacity-80">Scroll to explore</div>
+                    <div class="text-2xl">↓</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-8 sm:mb-12 lg:mb-16">
+                <h2 class="playfair text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 px-4 leading-tight">Our Gallery</h2>
+                <p class="text-sm xs:text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4 leading-relaxed">
+                    Explore our beautiful work and stunning transformations
+                </p>
+            </div>
+            
+            <!-- Gallery Header -->
+            <div class="text-center mb-8">
+                <h3 class="playfair text-xl font-semibold text-gray-800">Our Beautiful Work</h3>
+                <p class="text-gray-600">Stunning transformations and artistic creations</p>
+            </div>
+
+            
+            <!-- Gallery -->
+            <div class="gallery-container active" id="mainGallery">
+                <div class="relative">
+                    <div class="gallery-slider">
+                        <div class="gallery-track" id="mainGalleryTrack">
+                        <div class="gallery-card flex-shrink-0 w-64 sm:w-72 lg:w-80 mx-2 sm:mx-4 group">
+                            <div class="card-inner">
+                                <div class="card-front bg-gradient-to-br from-pink-200 to-rose-300 flex items-center justify-center relative overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=320&h=300&fit=crop&crop=center" alt="Hair Transformation" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="text-center relative z-10 bg-black bg-opacity-40 text-white p-4 rounded-lg" style="display: none;">
+                                        <div class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">💇‍♀️</div>
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold">Hair Transformation</h3>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold text-white">Hair Transformation</h3>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('hair')" class="bg-white text-amber-600 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-back">
+                                    <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=320&h=300&fit=crop&crop=center" alt="Hair Styling Process" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-pink-200 to-rose-300 flex items-center justify-center" style="display: none;">
+                                        <div class="text-6xl">✂️</div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('hair')" class="bg-white text-amber-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gallery-card flex-shrink-0 w-64 sm:w-72 lg:w-80 mx-2 sm:mx-4 group">
+                            <div class="card-inner">
+                                <div class="card-front bg-gradient-to-br from-purple-200 to-indigo-300 flex items-center justify-center relative overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=320&h=300&fit=crop&crop=center" alt="Skincare Results" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="text-center relative z-10 bg-black bg-opacity-40 text-white p-4 rounded-lg" style="display: none;">
+                                        <div class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">🧴</div>
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold">Skincare Results</h3>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold text-white">Skincare Results</h3>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('skincare')" class="bg-white text-amber-600 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-back">
+                                    <img src="New folder/skin.jpg" alt="Skincare Treatment" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-purple-200 to-indigo-300 flex items-center justify-center" style="display: none;">
+                                        <div class="text-6xl">✨</div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('skincare')" class="bg-white text-amber-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gallery-card flex-shrink-0 w-64 sm:w-72 lg:w-80 mx-2 sm:mx-4 group">
+                            <div class="card-inner">
+                                <div class="card-front bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center relative overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=320&h=300&fit=crop&crop=center" alt="Nail Art Gallery" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="text-center relative z-10 bg-black bg-opacity-40 text-white p-4 rounded-lg" style="display: none;">
+                                        <div class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">💅</div>
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold">Nail Art Gallery</h3>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold text-white">Nail Art Gallery</h3>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('nails')" class="bg-white text-amber-600 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-back">
+                                    <img src="https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=320&h=300&fit=crop&crop=center" alt="Nail Art Process" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center" style="display: none;">
+                                        <div class="text-6xl">💅</div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('nails')" class="bg-white text-amber-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gallery-card flex-shrink-0 w-64 sm:w-72 lg:w-80 mx-2 sm:mx-4 group">
+                            <div class="card-inner">
+                                <div class="card-front bg-gradient-to-br from-green-200 to-emerald-300 flex items-center justify-center relative overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=320&h=300&fit=crop&crop=face" alt="Bridal Beauty" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="text-center relative z-10 bg-black bg-opacity-40 text-white p-4 rounded-lg" style="display: none;">
+                                        <div class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">👰</div>
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold">Bridal Beauty</h3>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold text-white">Bridal Beauty</h3>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('bridal')" class="bg-white text-amber-600 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-back">
+                                    <img src="New folder/bridal.jpg" alt="Bridal Preparation" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-green-200 to-emerald-300 flex items-center justify-center" style="display: none;">
+                                        <div class="text-6xl">👰</div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('bridal')" class="bg-white text-amber-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gallery-card flex-shrink-0 w-64 sm:w-72 lg:w-80 mx-2 sm:mx-4 group">
+                            <div class="card-inner">
+                                <div class="card-front bg-gradient-to-br from-blue-200 to-cyan-300 flex items-center justify-center relative overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=320&h=300&fit=crop&crop=face" alt="Makeup Artistry" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="text-center relative z-10 bg-black bg-opacity-40 text-white p-4 rounded-lg" style="display: none;">
+                                        <div class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">💄</div>
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold">Makeup Artistry</h3>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                        <h3 class="playfair text-lg sm:text-xl font-semibold text-white">Makeup Artistry</h3>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('makeup')" class="bg-white text-amber-600 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-back">
+                                    <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=320&h=300&fit=crop&crop=center" alt="Makeup Application" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-200 to-cyan-300 flex items-center justify-center" style="display: none;">
+                                        <div class="text-6xl">💄</div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                        <button onclick="openGalleryModal('makeup')" class="bg-white text-amber-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base">
+                                            Read More
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="slideGallery('prev', 'main')" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                    <span class="text-xl">‹</span>
+                </button>
+                <button onclick="slideGallery('next', 'main')" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                    <span class="text-xl">›</span>
+                </button>
+            </div>
+            
+
+        </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-gradient-to-br from-amber-50 to-orange-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="playfair text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 px-4">What Our Clients Say</h2>
+                <p class="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
+                    Real experiences from our valued clients who trust us with their beauty needs
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="testimonial-card p-8 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face" alt="Sarah Johnson" class="w-16 h-16 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center text-white text-2xl font-bold" style="display: none;">
+                            S
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-gray-800">Sarah Johnson</h4>
+                            <div class="text-amber-500">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Absolutely amazing experience! The hair transformation exceeded my expectations. The team is professional, talented, and made me feel so comfortable throughout the entire process."</p>
+                </div>
+                
+                <div class="testimonial-card p-8 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face" alt="Michael Chen" class="w-16 h-16 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-2xl font-bold" style="display: none;">
+                            M
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-gray-800">Michael Chen</h4>
+                            <div class="text-amber-500">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Best men's grooming experience in the city! The beard trim and skincare treatment were perfect. Finally found a salon that understands men's needs. Highly recommend!"</p>
+                </div>
+                
+                <div class="testimonial-card p-8 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face" alt="Emily Rodriguez" class="w-16 h-16 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl font-bold" style="display: none;">
+                            E
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-gray-800">Emily Rodriguez</h4>
+                            <div class="text-amber-500">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"My wedding day was perfect thanks to Blume Beauty! The bridal package was comprehensive and the team made sure every detail was flawless. I felt like a princess!"</p>
+                </div>
+            </div>
+            
+            <!-- Stats Section -->
+            <div class="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="stats-counter playfair">500+</div>
+                    <p class="text-gray-600 font-medium">Happy Clients</p>
+                </div>
+                <div>
+                    <div class="stats-counter playfair">5</div>
+                    <p class="text-gray-600 font-medium">Years Experience</p>
+                </div>
+                <div>
+                    <div class="stats-counter playfair">15+</div>
+                    <p class="text-gray-600 font-medium">Services Offered</p>
+                </div>
+                <div>
+                    <div class="stats-counter playfair">98%</div>
+                    <p class="text-gray-600 font-medium">Satisfaction Rate</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Join Our Team Section -->
+    <section id="team" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center px-4">
+                <h2 class="playfair text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 sm:mb-8">Join Our Team</h2>
+                <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-8 sm:mb-12">
+                    Are you passionate about beauty and excellence? We're always looking for talented professionals to join our growing team.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 mb-8 sm:mb-12">
+                    <div class="text-left">
+                        <h3 class="playfair text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Why Work With Us?</h3>
+                        <ul class="space-y-2 sm:space-y-3 text-gray-600 text-sm sm:text-base">
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">✓</span> Competitive compensation</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">✓</span> Ongoing education and training</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">✓</span> Supportive team environment</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">✓</span> Career advancement opportunities</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">✓</span> Employee discounts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-left">
+                        <h3 class="playfair text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Current Openings</h3>
+                        <ul class="space-y-2 sm:space-y-3 text-gray-600 text-sm sm:text-base">
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">•</span> Senior Hair Stylist</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">•</span> Esthetician</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">•</span> Nail Technician</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">•</span> Massage Therapist</li>
+                            <li class="flex items-center"><span class="text-amber-600 mr-3 flex-shrink-0">•</span> Front Desk Coordinator</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button onclick="openApplyPanel()" class="bg-amber-600 text-white px-8 py-4 rounded-lg text-lg hover:bg-amber-700 transition-colors">
+                    Apply Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                <div class="sm:col-span-2 lg:col-span-1">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=48&h=48&fit=crop&crop=center" alt="Blume Beauty Logo" class="w-12 h-12 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-white font-bold text-xl">B</span>
+                        </div>
+                        <div>
+                            <h3 class="playfair text-lg sm:text-xl font-bold">Blume Beauty</h3>
+                            <p class="text-xs sm:text-sm text-gray-400">Professional Salon</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm sm:text-base">
+                        Your premier destination for luxury beauty services and transformative experiences.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm sm:text-base">Services</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm sm:text-base">
+                        <li><a href="#" onclick="openServiceModal('haircare')" class="hover:text-white transition-colors cursor-pointer">Hair Care</a></li>
+                        <li><a href="#" onclick="openServiceModal('skincare')" class="hover:text-white transition-colors cursor-pointer">Skin Care</a></li>
+                        <li><a href="#" onclick="openServiceModal('nails')" class="hover:text-white transition-colors cursor-pointer">Nail Care</a></li>
+                        <li><a href="#" onclick="openServiceModal('massage')" class="hover:text-white transition-colors cursor-pointer">Massage</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm sm:text-base">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm sm:text-base">
+                        <li><a href="#home" class="hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#services" class="hover:text-white transition-colors">Services</a></li>
+                        <li><a href="#gallery" class="hover:text-white transition-colors">Gallery</a></li>
+                        <li><a href="#team" class="hover:text-white transition-colors">Careers</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm sm:text-base">Contact Info</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm sm:text-base mb-6">
+                        <li>📍 123 Beauty Street</li>
+                        <li>📞 (555) 123-4567</li>
+                        <li>✉️ info@blumebeauty.ca</li>
+                        <li>🕒 Mon-Sat: 9AM-7PM</li>
+                    </ul>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-4 text-sm sm:text-base">Follow Us</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="social-icon text-gray-400 hover:text-amber-500 text-xl">📘</a>
+                            <a href="#" class="social-icon text-gray-400 hover:text-amber-500 text-xl">📷</a>
+                            <a href="#" class="social-icon text-gray-400 hover:text-amber-500 text-xl">🐦</a>
+                            <a href="#" class="social-icon text-gray-400 hover:text-amber-500 text-xl">💼</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Blume Beauty. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Sticky Contact Icons -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3">
+        <!-- WhatsApp Button -->
+        <button onclick="openWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.787"/>
+            </svg>
+        </button>
+        
+        <!-- Message Button -->
+        <button onclick="openContactPanel()" class="bg-amber-600 hover:bg-amber-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Watermark -->
+    <div class="text-center py-4 bg-gray-100 text-gray-600 text-sm">
+        James Dev &lt;/&gt;
+    </div>
+
+
+
+    <!-- Contact Slide Panel -->
+    <div class="overlay" id="overlay" onclick="closePanels()"></div>
+    <div class="slide-panel" id="contactPanel">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="playfair text-3xl font-bold text-gray-800">Contact Us</h2>
+                <button onclick="closePanels()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Get in Touch</h3>
+                    <p class="text-gray-600 mb-4">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                    <input type="text" id="contactName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input type="email" id="contactEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                    <input type="tel" id="contactPhone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                    <textarea rows="4" id="contactMessage" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+                </div>
+                
+                <button onclick="submitContactForm()" class="w-full bg-amber-600 text-white py-3 rounded-lg hover:bg-amber-700 transition-colors">
+                    Send Message
+                </button>
+                
+                <div class="border-t pt-6">
+                    <h4 class="font-semibold mb-4">Visit Our Salon</h4>
+                    <div class="space-y-2 text-gray-600">
+                        <p>📍 123 Beauty Street, City, Province</p>
+                        <p>📞 (555) 123-4567</p>
+                        <p>✉️ info@blumebeauty.ca</p>
+                        <p>🕒 Monday - Saturday: 9:00 AM - 7:00 PM</p>
+                        <p>🕒 Sunday: 10:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply Now Slide Panel -->
+    <div class="slide-panel" id="applyPanel">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="playfair text-3xl font-bold text-gray-800">Apply Now</h2>
+                <button onclick="closePanels()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Join Our Team</h3>
+                    <p class="text-gray-600 mb-4">We're excited to learn more about you! Please fill out this application form and we'll get back to you soon.</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Position Applying For *</label>
+                    <select id="applyPosition" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                        <option value="">Select a position</option>
+                        <option>Senior Hair Stylist</option>
+                        <option>Esthetician</option>
+                        <option>Nail Technician</option>
+                        <option>Massage Therapist</option>
+                        <option>Front Desk Coordinator</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                    <input type="text" id="applyName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                    <input type="email" id="applyEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                    <input type="tel" id="applyPhone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                    <select id="applyExperience" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                        <option value="">Select experience level</option>
+                        <option>Less than 1 year</option>
+                        <option>1-2 years</option>
+                        <option>3-5 years</option>
+                        <option>5-10 years</option>
+                        <option>10+ years</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Certifications/Licenses *</label>
+                    <textarea rows="3" id="applyCertifications" required placeholder="List any relevant certifications, licenses, or training..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Why do you want to work at Blume Beauty? *</label>
+                    <textarea rows="4" id="applyWhy" required placeholder="Tell us what attracts you to our salon..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Availability *</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Start Date *</label>
+                            <input type="date" id="applyStartDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Preferred Schedule *</label>
+                            <select id="applySchedule" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                <option value="">Select schedule</option>
+                                <option>Full-time</option>
+                                <option>Part-time</option>
+                                <option>Flexible</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="submitApplicationForm()" class="w-full bg-amber-600 text-white py-3 rounded-lg hover:bg-amber-700 transition-colors">
+                    Submit Application
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Slide Panel -->
+    <div class="slide-panel" id="bookingPanel">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="playfair text-3xl font-bold text-gray-800">Book Appointment</h2>
+                <button onclick="closePanels()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Schedule Your Visit</h3>
+                    <p class="text-gray-600 mb-4">Choose your preferred service and time. We'll confirm your appointment shortly.</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Service *</label>
+                    <select id="bookingService" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                        <option value="">Select a service</option>
+                        <option>Hair Cut & Style</option>
+                        <option>Hair Coloring</option>
+                        <option>Facial Treatment</option>
+                        <option>Manicure & Pedicure</option>
+                        <option>Massage Therapy</option>
+                        <option>Bridal Package</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Date *</label>
+                    <input type="date" id="bookingDate" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Time *</label>
+                    <select id="bookingTime" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                        <option value="">Select time</option>
+                        <option>9:00 AM</option>
+                        <option>10:00 AM</option>
+                        <option>11:00 AM</option>
+                        <option>12:00 PM</option>
+                        <option>1:00 PM</option>
+                        <option>2:00 PM</option>
+                        <option>3:00 PM</option>
+                        <option>4:00 PM</option>
+                        <option>5:00 PM</option>
+                        <option>6:00 PM</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+                    <input type="text" id="bookingName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                    <input type="tel" id="bookingPhone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input type="email" id="bookingEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Special Requests</label>
+                    <textarea rows="3" id="bookingRequests" placeholder="Any special requests or notes..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+                </div>
+                
+                <button onclick="submitBookingForm()" class="w-full bg-amber-600 text-white py-3 rounded-lg hover:bg-amber-700 transition-colors">
+                    Book Appointment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Modals -->
+    <div class="service-modal" id="serviceModal">
+        <div class="modal-content">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="playfair text-3xl font-bold text-gray-800" id="serviceModalTitle">Service Details</h2>
+                    <button onclick="closeServiceModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <div id="serviceModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div class="service-modal" id="galleryModal">
+        <div class="modal-content">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="playfair text-3xl font-bold text-gray-800" id="galleryModalTitle">Gallery Details</h2>
+                    <button onclick="closeGalleryModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <div id="galleryModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = { main: 0 };
+        const totalSlides = 5; // Total number of gallery cards per gallery
+        const slideWidth = window.innerWidth < 640 ? 272 : window.innerWidth < 1024 ? 304 : 336; // Responsive slide width
+        let isTransitioning = false;
+        let activeGallery = 'main';
+        
+        function openContactPanel() {
+            document.getElementById('contactPanel').classList.add('open');
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('bookingPanel').classList.remove('open');
+            document.getElementById('applyPanel').classList.remove('open');
+        }
+        
+        function openBookingPanel() {
+            document.getElementById('bookingPanel').classList.add('open');
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('contactPanel').classList.remove('open');
+            document.getElementById('applyPanel').classList.remove('open');
+        }
+        
+        function openApplyPanel() {
+            document.getElementById('applyPanel').classList.add('open');
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('contactPanel').classList.remove('open');
+            document.getElementById('bookingPanel').classList.remove('open');
+        }
+        
+        function closePanels() {
+            document.getElementById('contactPanel').classList.remove('open');
+            document.getElementById('bookingPanel').classList.remove('open');
+            document.getElementById('applyPanel').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+        }
+        
+
+        
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        function scrollToGallery(gallery) {
+            // Scroll to gallery section
+            document.getElementById('gallery').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            // Close mobile menu if open
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+        
+        function toggleMobileGallery() {
+            const dropdown = document.getElementById('mobileGalleryDropdown');
+            const arrow = document.getElementById('mobileGalleryArrow');
+            
+            dropdown.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+        
+        function slideGallery(direction, gallery) {
+            if (isTransitioning) return;
+            
+            const trackId = 'mainGalleryTrack';
+            const track = document.getElementById(trackId);
+            const cardsVisible = window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3;
+            const maxSlides = Math.max(0, totalSlides - cardsVisible);
+            
+            isTransitioning = true;
+            
+            if (direction === 'next') {
+                if (currentSlide.main >= maxSlides) {
+                    // At the end, create seamless loop to beginning
+                    currentSlide.main++;
+                    track.style.transform = `translateX(-${currentSlide.main * slideWidth}px)`;
+                    
+                    setTimeout(() => {
+                        track.style.transition = 'none';
+                        currentSlide.main = 0;
+                        track.style.transform = `translateX(-${currentSlide.main * slideWidth}px)`;
+                        
+                        setTimeout(() => {
+                            track.style.transition = 'transform 0.5s ease';
+                            isTransitioning = false;
+                        }, 50);
+                    }, 500);
+                } else {
+                    currentSlide.main++;
+                    track.style.transform = `translateX(-${currentSlide.main * slideWidth}px)`;
+                    setTimeout(() => { isTransitioning = false; }, 500);
+                }
+            } else if (direction === 'prev') {
+                if (currentSlide.main <= 0) {
+                    // At the beginning, create seamless loop to end
+                    track.style.transition = 'none';
+                    currentSlide.main = maxSlides + 1;
+                    track.style.transform = `translateX(-${currentSlide.main * slideWidth}px)`;
+                    
+                    setTimeout(() => {
+                        track.style.transition = 'transform 0.5s ease';
+                        currentSlide.main = maxSlides;
+                        track.style.transform = `translateX(-${currentSlide.main * slideWidth}px)`;
+                        setTimeout(() => { isTransitioning = false; }, 500);
+                    }, 50);
+                } else {
+                    currentSlide.main--;
+                    track.style.transform = `translateX(-${currentSlide.main * slideWidth}px)`;
+                    setTimeout(() => { isTransitioning = false; }, 500);
+                }
+            }
+        }
+        
+        function openServiceModal(service) {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('serviceModalTitle');
+            const content = document.getElementById('serviceModalContent');
+            
+            const serviceData = {
+                haircare: {
+                    title: 'Women\'s Hair Care Services',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Cuts & Styling</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Precision Cuts - ₦65,000-₦85,000</li>
+                                        <li>• Blowout & Style - ₦45,000</li>
+                                        <li>• Updo Styling - ₦75,000</li>
+                                        <li>• Layered Cuts - ₦70,000</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Color Services</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Full Color - ₦120,000-₦180,000</li>
+                                        <li>• Highlights - ₦140,000-₦200,000</li>
+                                        <li>• Balayage - ₦160,000-₦220,000</li>
+                                        <li>• Color Correction - ₦200,000+</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-3">Treatments</h3>
+                                <p class="text-gray-600 mb-4">Restore and nourish your hair with our professional treatments:</p>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Deep Conditioning Treatment - ₦35,000</li>
+                                    <li>• Keratin Treatment - ₦250,000</li>
+                                    <li>• Scalp Treatment - ₦45,000</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+
+                skincare: {
+                    title: 'Skin Care Services',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Facial Treatments</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Classic Facial - ₦85,000</li>
+                                        <li>• Anti-Aging Facial - ₦120,000</li>
+                                        <li>• Acne Treatment - ₦95,000</li>
+                                        <li>• Hydrating Facial - ₦100,000</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Advanced Treatments</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Microdermabrasion - ₦110,000</li>
+                                        <li>• Chemical Peel - ₦130,000</li>
+                                        <li>• LED Light Therapy - ₦75,000</li>
+                                        <li>• Oxygen Facial - ₦140,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-3">Consultation</h3>
+                                <p class="text-gray-600">Our licensed estheticians will analyze your skin and create a personalized treatment plan to address your specific concerns and goals.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                nails: {
+                    title: 'Nail Care Services',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Manicures</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Classic Manicure - ₦35,000</li>
+                                        <li>• Gel Manicure - ₦45,000</li>
+                                        <li>• French Manicure - ₦40,000</li>
+                                        <li>• Nail Art - ₦15,000+ per nail</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Pedicures</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Classic Pedicure - ₦45,000</li>
+                                        <li>• Spa Pedicure - ₦65,000</li>
+                                        <li>• Gel Pedicure - ₦55,000</li>
+                                        <li>• Callus Treatment - ₦25,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-3">Specialty Services</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Nail Extensions - ₦65,000</li>
+                                    <li>• Nail Repair - ₦10,000 per nail</li>
+                                    <li>• Paraffin Treatment - ₦15,000</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                massage: {
+                    title: 'Massage Therapy',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Relaxation Massage</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Swedish Massage (60min) - ₦95,000</li>
+                                        <li>• Swedish Massage (90min) - ₦135,000</li>
+                                        <li>• Hot Stone Massage - ₦120,000</li>
+                                        <li>• Aromatherapy Massage - ₦105,000</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Therapeutic Massage</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Deep Tissue Massage - ₦110,000</li>
+                                        <li>• Sports Massage - ₦115,000</li>
+                                        <li>• Prenatal Massage - ₦100,000</li>
+                                        <li>• Couples Massage - ₦190,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-3">Benefits</h3>
+                                <p class="text-gray-600">Our licensed massage therapists provide therapeutic treatments to reduce stress, relieve muscle tension, improve circulation, and promote overall wellness.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                makeup: {
+                    title: 'Makeup Services',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Special Occasion</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Event Makeup - ₦75,000</li>
+                                        <li>• Prom Makeup - ₦65,000</li>
+                                        <li>• Photo Shoot Makeup - ₦85,000</li>
+                                        <li>• Party Makeup - ₦60,000</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Lessons & Consultation</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Makeup Lesson - ₦95,000</li>
+                                        <li>• Color Consultation - ₦45,000</li>
+                                        <li>• Makeup Trial - ₦65,000</li>
+                                        <li>• Product Consultation - ₦35,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-3">Professional Application</h3>
+                                <p class="text-gray-600">Our makeup artists use high-quality products and techniques to create the perfect look for any occasion, from natural everyday beauty to glamorous evening looks.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                bridal: {
+                    title: 'Bridal Packages',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Bridal Packages</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Bride Complete Package - ₦350,000</li>
+                                        <li>• Bridal Trial - ₦150,000</li>
+                                        <li>• Bridesmaid Makeup - ₦65,000 each</li>
+                                        <li>• Mother of Bride - ₦75,000</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-3">Package Includes</h3>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li>• Hair styling & makeup</li>
+                                        <li>• Consultation & trial</li>
+                                        <li>• Touch-up kit</li>
+                                        <li>• On-location service</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-3">Your Special Day</h3>
+                                <p class="text-gray-600">Make your wedding day perfect with our comprehensive bridal beauty services. We'll work with you to create the ideal look that complements your style and vision.</p>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+            
+            title.textContent = serviceData[service].title;
+            content.innerHTML = serviceData[service].content;
+            modal.style.display = 'flex';
+        }
+        
+        function closeServiceModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+        }
+        
+        function openGalleryModal(type) {
+            const modal = document.getElementById('galleryModal');
+            const title = document.getElementById('galleryModalTitle');
+            const content = document.getElementById('galleryModalContent');
+            
+            const galleryData = {
+                hair: {
+                    title: 'Hair Transformation Gallery',
+                    content: `
+                        <div class="space-y-6">
+                            <p class="text-gray-600 text-lg">Discover stunning hair transformations from our talented stylists. From dramatic color changes to precision cuts, see how we help our clients express their unique style.</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-br from-pink-100 to-rose-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">✂️</div>
+                                    <h4 class="font-semibold">Precision Cuts</h4>
+                                    <p class="text-sm text-gray-600">Modern styles tailored to your face shape</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-purple-100 to-indigo-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">🎨</div>
+                                    <h4 class="font-semibold">Color Artistry</h4>
+                                    <p class="text-sm text-gray-600">Vibrant colors and natural highlights</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-semibold mb-3">Featured Transformations</h4>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Blonde balayage on brunette hair</li>
+                                    <li>• Pixie cut transformation</li>
+                                    <li>• Rainbow color highlights</li>
+                                    <li>• Keratin smoothing treatment results</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                skincare: {
+                    title: 'Skincare Results Gallery',
+                    content: `
+                        <div class="space-y-6">
+                            <p class="text-gray-600 text-lg">See the amazing results our skincare treatments can achieve. From acne clearing to anti-aging, our before and after gallery showcases real client transformations.</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-br from-green-100 to-emerald-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">✨</div>
+                                    <h4 class="font-semibold">Glowing Skin</h4>
+                                    <p class="text-sm text-gray-600">Radiant, healthy complexions</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-blue-100 to-cyan-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">🌟</div>
+                                    <h4 class="font-semibold">Clear Results</h4>
+                                    <p class="text-sm text-gray-600">Acne treatment success stories</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-semibold mb-3">Treatment Results</h4>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Acne clearing after 6 sessions</li>
+                                    <li>• Fine line reduction with anti-aging facials</li>
+                                    <li>• Hyperpigmentation improvement</li>
+                                    <li>• Hydration boost for dry skin</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                nails: {
+                    title: 'Nail Art Gallery',
+                    content: `
+                        <div class="space-y-6">
+                            <p class="text-gray-600 text-lg">Explore our creative nail art designs and perfect manicures. From elegant French tips to intricate artistic designs, see our nail technicians' amazing work.</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-br from-pink-100 to-rose-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">💅</div>
+                                    <h4 class="font-semibold">Artistic Designs</h4>
+                                    <p class="text-sm text-gray-600">Custom nail art creations</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-purple-100 to-indigo-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">💎</div>
+                                    <h4 class="font-semibold">Luxury Finishes</h4>
+                                    <p class="text-sm text-gray-600">Gel and premium treatments</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-semibold mb-3">Popular Designs</h4>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Seasonal nail art collections</li>
+                                    <li>• Wedding and special occasion nails</li>
+                                    <li>• Geometric and abstract patterns</li>
+                                    <li>• Classic French and ombre styles</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                bridal: {
+                    title: 'Bridal Beauty Gallery',
+                    content: `
+                        <div class="space-y-6">
+                            <p class="text-gray-600 text-lg">See our beautiful brides on their special day. From romantic updos to flawless makeup, we help create the perfect bridal look for every style and theme.</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-br from-rose-100 to-pink-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">👰</div>
+                                    <h4 class="font-semibold">Bridal Hair</h4>
+                                    <p class="text-sm text-gray-600">Elegant updos and romantic styles</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-amber-100 to-orange-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">💄</div>
+                                    <h4 class="font-semibold">Bridal Makeup</h4>
+                                    <p class="text-sm text-gray-600">Flawless, long-lasting beauty</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-semibold mb-3">Bridal Styles</h4>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Classic romantic updos</li>
+                                    <li>• Bohemian loose waves</li>
+                                    <li>• Natural glowing makeup</li>
+                                    <li>• Vintage-inspired looks</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                makeup: {
+                    title: 'Makeup Artistry Gallery',
+                    content: `
+                        <div class="space-y-6">
+                            <p class="text-gray-600 text-lg">Discover our makeup artistry for special events, photo shoots, and everyday glamour. See how we enhance natural beauty with professional techniques and high-quality products.</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-br from-red-100 to-pink-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">🎭</div>
+                                    <h4 class="font-semibold">Glamour Looks</h4>
+                                    <p class="text-sm text-gray-600">Evening and special event makeup</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-yellow-100 to-amber-200 p-6 rounded-lg text-center">
+                                    <div class="text-4xl mb-2">📸</div>
+                                    <h4 class="font-semibold">Photo Ready</h4>
+                                    <p class="text-sm text-gray-600">Professional photo shoot makeup</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h4 class="font-semibold mb-3">Makeup Styles</h4>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Natural everyday looks</li>
+                                    <li>• Dramatic evening makeup</li>
+                                    <li>• Editorial and fashion makeup</li>
+                                    <li>• Color correction and contouring</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+
+            };
+            
+            title.textContent = galleryData[type].title;
+            content.innerHTML = galleryData[type].content;
+            modal.style.display = 'flex';
+        }
+        
+        function closeGalleryModal() {
+            document.getElementById('galleryModal').style.display = 'none';
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const serviceModal = document.getElementById('serviceModal');
+            const galleryModal = document.getElementById('galleryModal');
+            if (event.target === serviceModal) {
+                closeServiceModal();
+            }
+            if (event.target === galleryModal) {
+                closeGalleryModal();
+            }
+        }
+        
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.sticky-header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+        
+        // Loading screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1500);
+        });
+        
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe service cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(card);
+            });
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Hero slideshow functionality
+        let currentHeroSlide = 0;
+        const heroSlides = [
+            {
+                title: "Beauty Redefined",
+                subtitle: "Experience luxury and elegance at Blume Beauty. Where every visit transforms you into your most beautiful self.",
+                imageId: "heroImage1"
+            },
+            {
+                title: "Hair Artistry",
+                subtitle: "Discover stunning hair transformations with our expert stylists. From precision cuts to vibrant colors, we bring your vision to life.",
+                imageId: "heroImage2"
+            },
+            {
+                title: "Elegant Excellence",
+                subtitle: "Professional beauty services crafted for the modern woman. From classic styles to contemporary trends, we celebrate feminine beauty.",
+                imageId: "heroImage3"
+            },
+            {
+                title: "Complete Wellness",
+                subtitle: "Rejuvenate and refresh with our comprehensive treatments. Skincare, massage, and beauty services designed for women.",
+                imageId: "heroImage4"
+            }
+        ];
+
+        function changeHeroSlide() {
+            const heroContent = document.querySelector('.hero-content');
+            const heroTitle = document.getElementById('heroTitle');
+            const heroSubtitle = document.getElementById('heroSubtitle');
+            const currentImage = document.querySelector('.hero-image.active');
+            
+            // Start transition effects
+            heroContent.classList.add('fade-out');
+            
+            setTimeout(() => {
+                // Update slide
+                const nextSlide = (currentHeroSlide + 1) % heroSlides.length;
+                const nextSlideData = heroSlides[nextSlide];
+                const nextImage = document.getElementById(nextSlideData.imageId);
+                
+                // Hide current image
+                if (currentImage) {
+                    currentImage.classList.remove('active');
+                }
+                
+                // Show next image
+                if (nextImage) {
+                    nextImage.classList.add('active');
+                }
+                
+                // Update content
+                heroTitle.textContent = nextSlideData.title;
+                heroSubtitle.textContent = nextSlideData.subtitle;
+                
+                currentHeroSlide = nextSlide;
+                
+                setTimeout(() => {
+                    // Fade in content
+                    heroContent.classList.remove('fade-out');
+                }, 200);
+            }, 600);
+        }
+
+        // Start hero slideshow
+        setInterval(changeHeroSlide, 5000);
+
+        // Add parallax effect to hero background with throttling
+        let ticking = false;
+        function updateParallax() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-bg');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+            
+            // Hide scroll indicator after scrolling
+            if (scrollIndicator) {
+                scrollIndicator.style.opacity = scrolled > 100 ? '0' : '1';
+            }
+            
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        });
+
+        // Add smooth scroll behavior to html
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stats-counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent.replace(/\D/g, ''));
+                const suffix = counter.textContent.replace(/\d/g, '');
+                let current = 0;
+                const increment = target / 50;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.ceil(current) + suffix;
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target + suffix;
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+
+        // Trigger counter animation when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // Observe stats section
+        document.addEventListener('DOMContentLoaded', function() {
+            const statsSection = document.querySelector('.stats-counter');
+            if (statsSection) {
+                statsObserver.observe(statsSection.parentElement);
+            }
+        });
+
+        // Form submission functions
+        function submitContactForm() {
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            if (!name || !email || !phone || !message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Create WhatsApp message
+            const whatsappMessage = `Hello! I'm ${name} and I'd like to get in touch with Blume Beauty.
+
+📧 Email: ${email}
+📞 Phone: ${phone}
+
+💬 Message: ${message}
+
+Looking forward to hearing from you!`;
+            
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            const whatsappURL = `https://wa.me/2348123456789?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.open(whatsappURL, '_blank');
+            
+            // Clear form and close panel
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactEmail').value = '';
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactMessage').value = '';
+            closePanels();
+            
+            alert('Thank you! Your message has been prepared for WhatsApp. Please send it to complete your inquiry.');
+        }
+
+        function submitBookingForm() {
+            const service = document.getElementById('bookingService').value;
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            const name = document.getElementById('bookingName').value;
+            const phone = document.getElementById('bookingPhone').value;
+            const email = document.getElementById('bookingEmail').value;
+            const requests = document.getElementById('bookingRequests').value;
+            
+            if (!service || !date || !time || !name || !phone || !email) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Create WhatsApp message
+            const whatsappMessage = `Hello! I'd like to book an appointment at Blume Beauty.
+
+👤 Name: ${name}
+📧 Email: ${email}
+📞 Phone: ${phone}
+
+💅 Service: ${service}
+📅 Preferred Date: ${date}
+🕐 Preferred Time: ${time}
+
+${requests ? `📝 Special Requests: ${requests}` : ''}
+
+Please confirm my appointment. Thank you!`;
+            
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            const whatsappURL = `https://wa.me/2348123456789?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.open(whatsappURL, '_blank');
+            
+            // Clear form and close panel
+            document.getElementById('bookingService').value = '';
+            document.getElementById('bookingDate').value = '';
+            document.getElementById('bookingTime').value = '';
+            document.getElementById('bookingName').value = '';
+            document.getElementById('bookingPhone').value = '';
+            document.getElementById('bookingEmail').value = '';
+            document.getElementById('bookingRequests').value = '';
+            closePanels();
+            
+            alert('Thank you! Your booking request has been prepared for WhatsApp. Please send it to confirm your appointment.');
+        }
+
+        function submitApplicationForm() {
+            const position = document.getElementById('applyPosition').value;
+            const name = document.getElementById('applyName').value;
+            const email = document.getElementById('applyEmail').value;
+            const phone = document.getElementById('applyPhone').value;
+            const experience = document.getElementById('applyExperience').value;
+            const certifications = document.getElementById('applyCertifications').value;
+            const why = document.getElementById('applyWhy').value;
+            const startDate = document.getElementById('applyStartDate').value;
+            const schedule = document.getElementById('applySchedule').value;
+            
+            if (!position || !name || !email || !phone || !experience || !certifications || !why || !startDate || !schedule) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Create WhatsApp message
+            const whatsappMessage = `Hello! I'd like to apply for a position at Blume Beauty.
+
+👤 Name: ${name}
+📧 Email: ${email}
+📞 Phone: ${phone}
+
+💼 Position: ${position}
+📈 Experience: ${experience}
+📅 Available Start Date: ${startDate}
+⏰ Preferred Schedule: ${schedule}
+
+🏆 Certifications/Licenses:
+${certifications}
+
+💭 Why Blume Beauty:
+${why}
+
+I'm excited about the opportunity to join your team!`;
+            
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            const whatsappURL = `https://wa.me/2348123456789?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.open(whatsappURL, '_blank');
+            
+            // Clear form and close panel
+            document.getElementById('applyPosition').value = '';
+            document.getElementById('applyName').value = '';
+            document.getElementById('applyEmail').value = '';
+            document.getElementById('applyPhone').value = '';
+            document.getElementById('applyExperience').value = '';
+            document.getElementById('applyCertifications').value = '';
+            document.getElementById('applyWhy').value = '';
+            document.getElementById('applyStartDate').value = '';
+            document.getElementById('applySchedule').value = '';
+            closePanels();
+            
+            alert('Thank you! Your application has been prepared for WhatsApp. Please send it to complete your job application.');
+        }
+
+        function openWhatsApp() {
+            const whatsappMessage = `Hello! I'm interested in Blume Beauty's services. Could you please provide more information?`;
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            const whatsappURL = `https://wa.me/2348123456789?text=${encodedMessage}`;
+            window.open(whatsappURL, '_blank');
+        }
+    </script>
+</body>
+</html>
